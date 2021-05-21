@@ -18,26 +18,22 @@ namespace VirtualCamera
         public WindowRenderTarget CameraView;
         public Vector3 Position;
         public Vector3 Target;
-        public float Zoom;
-
-        private Matrix XAxisRotationMatrix;
-        private Matrix YAxisRotationMatrix;
-        private Matrix ZAxisRotationMatrix;
 
         public byte[] SceneCache;
         public SharpDX.Direct2D1.Bitmap SceneBuffer;
-        private List<Object3D> objects;
+
+        public List<Sphere> SceneObjects;
+        public LightSource Light;
 
         public Camera()
         {
             renderForm = new RenderForm("VirtualCamera");
             renderForm.ClientSize = new Size(Width, Height);
             renderForm.AllowUserResizing = false;
-            Position = new Vector3(0, 0, 0);
+            Position = new Vector3(0, 0, 10);
             Target = new Vector3(0, 0, 9f);
 
             SceneCache = new byte[Width * Height * 4];
-            Zoom = 1;
 
             RenderTargetProperties renderTargetProperties = new RenderTargetProperties()
             {
@@ -58,12 +54,13 @@ namespace VirtualCamera
             CameraView = new WindowRenderTarget(new Factory(), renderTargetProperties, hwndProperties);
             SceneBuffer = new SharpDX.Direct2D1.Bitmap(CameraView, new SharpDX.Size2(Width, Height), new SharpDX.Direct2D1.BitmapProperties(CameraView.PixelFormat));
 
-            objects = new List<Object3D>();
+            SceneObjects = new List<Sphere>();
+            Light = new LightSource(0, 0, 5);
         }
 
-        public void AddObject(Object3D obj)
+        public void AddSphere(Sphere sphere)
         {
-            this.objects.Add(obj);
+            SceneObjects.Add(sphere);
         }
 
         private void ClearScene(byte r = 0, byte g = 0, byte b = 0, byte a = 255)
@@ -79,7 +76,7 @@ namespace VirtualCamera
 
         private void Draw()
         {
-            Converter.Render(objects, this);
+            Converter.Render(SceneObjects, this);
 
             SceneBuffer.CopyFromMemory(SceneCache, 4 * Width);
             CameraView.BeginDraw();
@@ -95,227 +92,7 @@ namespace VirtualCamera
 
         private void CheckInput()
         {
-            if (Keyboard.IsKeyDown(Key.Up))
-            {
-                foreach(var obj in objects)
-                {
-                    obj.Position = new Vector3(obj.Position.X, obj.Position.Y - 0.05f, obj.Position.Z);
-                    for(int i = 0; i < obj.Walls.Count; i++)
-                    {
-                        for (int j = 0; j < obj.Walls[i].Vertices.Count; j++)
-                        {
-                            obj.Walls[i].Vertices[j] = new Vector3(obj.Walls[i].Vertices[j].X, obj.Walls[i].Vertices[j].Y - 0.05f, obj.Walls[i].Vertices[j].Z);
-                        }
-                        obj.Walls[i].FindPlanes();
-                    }
-                }
-            }
-
-            if (Keyboard.IsKeyDown(Key.Down))
-            {
-                foreach (var obj in objects)
-                {
-                    obj.Position = new Vector3(obj.Position.X, obj.Position.Y + 0.05f, obj.Position.Z);
-                    for (int i = 0; i < obj.Walls.Count; i++)
-                    {
-                        for (int j = 0; j < obj.Walls[i].Vertices.Count; j++)
-                        {
-                            obj.Walls[i].Vertices[j] = new Vector3(obj.Walls[i].Vertices[j].X, obj.Walls[i].Vertices[j].Y + 0.05f, obj.Walls[i].Vertices[j].Z);
-                        }
-                        obj.Walls[i].FindPlanes();
-                    }
-                }
-            }
-
-            if (Keyboard.IsKeyDown(Key.Left))
-            {
-                foreach (var obj in objects)
-                {
-                    obj.Position = new Vector3(obj.Position.X + 0.05f, obj.Position.Y, obj.Position.Z);
-                    for (int i = 0; i < obj.Walls.Count; i++)
-                    {
-                        for (int j = 0; j < obj.Walls[i].Vertices.Count; j++)
-                        {
-                            obj.Walls[i].Vertices[j] = new Vector3(obj.Walls[i].Vertices[j].X + 0.05f, obj.Walls[i].Vertices[j].Y, obj.Walls[i].Vertices[j].Z);
-                        }
-                        obj.Walls[i].FindPlanes();
-                    }
-                }
-            }
-
-            if (Keyboard.IsKeyDown(Key.Right))
-            {
-                foreach (var obj in objects)
-                {
-                    obj.Position = new Vector3(obj.Position.X - 0.05f, obj.Position.Y, obj.Position.Z);
-                    for (int i = 0; i < obj.Walls.Count; i++)
-                    {
-                        for (int j = 0; j < obj.Walls[i].Vertices.Count; j++)
-                        {
-                            obj.Walls[i].Vertices[j] = new Vector3(obj.Walls[i].Vertices[j].X - 0.05f, obj.Walls[i].Vertices[j].Y, obj.Walls[i].Vertices[j].Z);
-                        }
-                        obj.Walls[i].FindPlanes();
-                    }
-                }
-            } 
-
-            if (Keyboard.IsKeyDown(Key.W))
-            {
-                foreach (var obj in objects)
-                {
-                    obj.Position = new Vector3(obj.Position.X, obj.Position.Y, obj.Position.Z + 0.05f);
-                    for (int i = 0; i < obj.Walls.Count; i++)
-                    {
-                        for (int j = 0; j < obj.Walls[i].Vertices.Count; j++)
-                        {
-                            obj.Walls[i].Vertices[j] = new Vector3(obj.Walls[i].Vertices[j].X, obj.Walls[i].Vertices[j].Y, obj.Walls[i].Vertices[j].Z + 0.05f);
-                        }
-                        obj.Walls[i].FindPlanes();
-                    }
-                }
-            }
-
-            if (Keyboard.IsKeyDown(Key.S))
-            {
-                foreach (var obj in objects)
-                {
-                    obj.Position = new Vector3(obj.Position.X, obj.Position.Y, obj.Position.Z - 0.05f);
-                    for (int i = 0; i < obj.Walls.Count; i++)
-                    {
-                        for (int j = 0; j < obj.Walls[i].Vertices.Count; j++)
-                        {
-                            obj.Walls[i].Vertices[j] = new Vector3(obj.Walls[i].Vertices[j].X, obj.Walls[i].Vertices[j].Y, obj.Walls[i].Vertices[j].Z - 0.05f);
-                        }
-                        obj.Walls[i].FindPlanes();
-                    }
-                }
-            }
-
-
-            if (Keyboard.IsKeyDown(Key.Add))
-            {
-                if (Zoom < 5)
-                {
-                    Zoom += 0.1f;
-                }
-            }
-
-            if (Keyboard.IsKeyDown(Key.Subtract))
-            {
-                Zoom -= 0.1f;
-                if (Zoom < 1)
-                {
-                    Zoom = 1;
-                }
-            }
-
-            if (Keyboard.IsKeyDown(Key.X)) // rotacja wzgledem osi OX
-            {
-                if (Keyboard.IsKeyDown(Key.LeftShift))
-                {
-                    Matrix.RotationX(0.01f, out XAxisRotationMatrix);
-                    foreach (var obj in objects)
-                    {
-                        obj.Position = Vector3.TransformCoordinate(obj.Position, XAxisRotationMatrix);
-                        for (int i = 0; i < obj.Walls.Count; i++)
-                        {
-                            for(int j = 0; j < obj.Walls[i].Vertices.Count; j++)
-                            {
-                                obj.Walls[i].Vertices[j] = Vector3.TransformCoordinate(obj.Walls[i].Vertices[j], XAxisRotationMatrix);
-                            }
-                            obj.Walls[i].FindPlanes();
-                        }
-                    }
-                }
-                else
-                {
-                    Matrix.RotationX(-0.01f, out XAxisRotationMatrix); // inicjowanie/nadpisywanie macierzy
-                    foreach (var obj in objects)
-                    {
-                        obj.Position = Vector3.TransformCoordinate(obj.Position, XAxisRotationMatrix);
-                        for (int i = 0; i < obj.Walls.Count; i++)
-                        {
-                            for (int j = 0; j < obj.Walls[i].Vertices.Count; j++)
-                            {
-                                obj.Walls[i].Vertices[j] = Vector3.TransformCoordinate(obj.Walls[i].Vertices[j], XAxisRotationMatrix);
-                            }
-                            obj.Walls[i].FindPlanes();
-                        }
-                    }
-                }
-            }
-            
-            if (Keyboard.IsKeyDown(Key.Y)) // rotacja wokol osi OY
-            {
-                if (Keyboard.IsKeyDown(Key.LeftShift))
-                {
-                    Matrix.RotationY(-0.01f, out YAxisRotationMatrix);
-                    foreach (var obj in objects)
-                    {
-                        obj.Position = Vector3.TransformCoordinate(obj.Position, YAxisRotationMatrix);
-                        for (int i = 0; i < obj.Walls.Count; i++)
-                        {
-                            for (int j = 0; j < obj.Walls[i].Vertices.Count; j++)
-                            {
-                                obj.Walls[i].Vertices[j] = Vector3.TransformCoordinate(obj.Walls[i].Vertices[j], YAxisRotationMatrix);
-                            }
-                            obj.Walls[i].FindPlanes();
-                        }
-                    }
-                }
-                else
-                {
-                    Matrix.RotationY(0.01f, out YAxisRotationMatrix); // inicjowanie/nadpisywanie macierzy
-                    foreach (var obj in objects)
-                    {
-                        obj.Position = Vector3.TransformCoordinate(obj.Position, YAxisRotationMatrix);
-                        for (int i = 0; i < obj.Walls.Count; i++)
-                        {
-                            for (int j = 0; j < obj.Walls[i].Vertices.Count; j++)
-                            {
-                                obj.Walls[i].Vertices[j] = Vector3.TransformCoordinate(obj.Walls[i].Vertices[j], YAxisRotationMatrix);
-                            }
-                            obj.Walls[i].FindPlanes();
-                        }
-                    }
-                }
-            }
-            
-            if (Keyboard.IsKeyDown(Key.Z)) // obrot wokol osi OZ
-            {
-                if (Keyboard.IsKeyDown(Key.LeftShift))
-                {
-                    Matrix.RotationZ(-0.01f, out ZAxisRotationMatrix);
-                    foreach (var obj in objects)
-                    {
-                        obj.Position = Vector3.TransformCoordinate(obj.Position, ZAxisRotationMatrix);
-                        for (int i = 0; i < obj.Walls.Count; i++)
-                        {
-                            for (int j = 0; j < obj.Walls[i].Vertices.Count; j++)
-                            {
-                                obj.Walls[i].Vertices[j] = Vector3.TransformCoordinate(obj.Walls[i].Vertices[j], ZAxisRotationMatrix);
-                            }
-                            obj.Walls[i].FindPlanes();
-                        }
-                    }
-                }
-                else
-                {
-                    Matrix.RotationZ(0.01f, out ZAxisRotationMatrix); // inicjowanie/nadpisywanie macierzy
-                    foreach (var obj in objects)
-                    {
-                        obj.Position = Vector3.TransformCoordinate(obj.Position, ZAxisRotationMatrix);
-                        for (int i = 0; i < obj.Walls.Count; i++)
-                        {
-                            for (int j = 0; j < obj.Walls[i].Vertices.Count; j++)
-                            {
-                                obj.Walls[i].Vertices[j] = Vector3.TransformCoordinate(obj.Walls[i].Vertices[j], ZAxisRotationMatrix);
-                            }
-                            obj.Walls[i].FindPlanes();
-                        }
-                    }
-                }
-            }
+            // modify light source
         }
 
         private void RenderCallback()
