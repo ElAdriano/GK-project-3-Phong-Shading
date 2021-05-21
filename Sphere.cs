@@ -15,12 +15,12 @@ namespace VirtualCamera
         public Color4 Color;
         public Vector3 Ambient;
 
-        float IA = 1;
-        float IP = 1;
-        float KA = (float)0.05;
-        float KD = (float)0.5;
-        float KS = (float)0.5;
-        float N = 5;
+        float IA = 0.5f;
+        float IP = 0.5f;
+        float KA = (float)0.5;
+        float KD = (float)0.005;
+        float KS = (float)0.05;
+        float N = 15;
 
 
         public Sphere(Vector3 origin, float r, Color4 color)
@@ -60,6 +60,11 @@ namespace VirtualCamera
             float rdotpo = Vector3.Dot(r,poVector);
 
             return (float)(IA * KA + IP * KD * Math.Max(ndotpl,0) +  Math.Pow(KS * Math.Max(rdotpo,0), N));
+        }
+
+        public bool IsPixelOwned(float pixelX, float pixelY)
+        {
+            return Math.Pow((pixelX - Origin.X), 2) + Math.Pow((pixelY - Origin.Y), 2) <= Math.Pow(R, 2);
         }
     }
 }

@@ -21,8 +21,8 @@ namespace VirtualCamera
 
         private static Vector2 UncastFrom2D(int pixelX, int pixelY)
         {
-            var x = (2 * pixelX - Camera.Width) / (2 * Camera.Width);
-            var y = (Camera.Height - 2*pixelY) / Camera.Height;
+            var x = (2 * (float)pixelX - (float)Camera.Width) / (2 * (float)Camera.Width);
+            var y = ((float)Camera.Height - 2 * (float)pixelY) / (2 * (float)Camera.Height);
             return new Vector2(x, y);
         }
 
@@ -42,14 +42,34 @@ namespace VirtualCamera
                     {
                         Vector2 point = UncastFrom2D(width, height);
 
-                        float illumination = obj.getIlumination(point.X, point.Y, camera.Position, camera.Light.Position);
-                        byte intensity = (byte)Math.Min(illumination * 255, 255);
-                        if (intensity > 0)
+                        //Console.WriteLine("x: {0}, y: {1}", point.X, point.Y);
+                        bool shouldPaintPixel = obj.IsPixelOwned(point.X, point.Y);
+                        if (shouldPaintPixel)
                         {
-                            Console.WriteLine(intensity);
+                            float illumination = obj.getIlumination(point.X, point.Y, camera.Position, camera.Light.Position);
+                            float intensity = (float)Math.Min(illumination, 1);
+                            var calculatedColor = intensity * obj.Color;
+
+                            var redColorValue = calculatedColor.Red * 255;
+                            if (redColorValue > 255)
+                            {
+                                Console.WriteLine("Red color value exceeded : value = {0}", redColorValue);
+                            }
+
+                            var greenColorValue = calculatedColor.Green * 255;
+                            if (greenColorValue > 255)
+                            {
+                                Console.WriteLine("Green color value exceeded : value = {0}", greenColorValue);
+                            }
+
+                            var blueColorValue = calculatedColor.Blue * 255;
+                            if (blueColorValue > 255)
+                            {
+                                Console.WriteLine("Blue color value exceeded : value = {0}", blueColorValue);
+                            }
+
+                            UpdatePixelValue(width, height, (byte)redColorValue, (byte)greenColorValue, (byte)blueColorValue, 255, camera);
                         }
-                        var calculatedColor = intensity * obj.Color;
-                        UpdatePixelValue(width, height, (byte)calculatedColor.Red, (byte)calculatedColor.Green, (byte)calculatedColor.Blue, 255, camera);
                     }
                 }
             }

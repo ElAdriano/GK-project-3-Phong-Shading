@@ -13,7 +13,7 @@ namespace VirtualCamera
         private RenderForm renderForm;
 
         public const int Width = 640;
-        public const int Height = 480;
+        public const int Height = 640;
 
         public WindowRenderTarget CameraView;
         public Vector3 Position;
@@ -55,12 +55,46 @@ namespace VirtualCamera
             SceneBuffer = new SharpDX.Direct2D1.Bitmap(CameraView, new SharpDX.Size2(Width, Height), new SharpDX.Direct2D1.BitmapProperties(CameraView.PixelFormat));
 
             SceneObjects = new List<Sphere>();
-            Light = new LightSource(0, 0, 5);
+            Light = new LightSource(0, 10, 0);
         }
 
         public void AddSphere(Sphere sphere)
         {
             SceneObjects.Add(sphere);
+        }
+
+        // Modifies light source position
+        public void HandleInput()
+        {
+            if (Keyboard.IsKeyDown(Key.Down))
+            {
+                Light.Position = new Vector3(Light.Position.X, Light.Position.Y - 0.5f, Light.Position.Z);
+            }
+
+            if (Keyboard.IsKeyDown(Key.Up))
+            {
+                Light.Position = new Vector3(Light.Position.X, Light.Position.Y + 0.5f, Light.Position.Z);
+            }
+
+            if (Keyboard.IsKeyDown(Key.Right))
+            {
+                Light.Position = new Vector3(Light.Position.X + 0.5f, Light.Position.Y, Light.Position.Z);
+            }
+
+            if (Keyboard.IsKeyDown(Key.Left))
+            {
+                Light.Position = new Vector3(Light.Position.X - 0.5f, Light.Position.Y, Light.Position.Z);
+            }
+
+            if (Keyboard.IsKeyDown(Key.W))
+            {
+                Light.Position = new Vector3(Light.Position.X, Light.Position.Y, Light.Position.Z + 0.5f);
+            }
+
+            if (Keyboard.IsKeyDown(Key.S))
+            {
+                Light.Position = new Vector3(Light.Position.X, Light.Position.Y, Light.Position.Z - 0.5f);
+            }
         }
 
         private void ClearScene(byte r = 0, byte g = 0, byte b = 0, byte a = 255)
@@ -77,6 +111,8 @@ namespace VirtualCamera
         private void Draw()
         {
             Converter.Render(SceneObjects, this);
+
+            HandleInput();
 
             SceneBuffer.CopyFromMemory(SceneCache, 4 * Width);
             CameraView.BeginDraw();

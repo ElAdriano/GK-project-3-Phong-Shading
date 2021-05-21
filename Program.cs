@@ -12,12 +12,12 @@ namespace VirtualCamera
 {
     class Program
     {
-        //[STAThread]
+        [STAThread]
         static void Main(string[] args)
         {
             using (Camera VirtualCamera = new Camera())
             {
-                Sphere sphere1 = new Sphere(new Vector3(0, 0, 10), 50, new Color4(new Color3(0, 255, 0), 255));
+                Sphere sphere1 = new Sphere(new Vector3(0, 0, 10), 0.1f, new Color4(new Color3(0, 255, 0), 255));
                 VirtualCamera.AddSphere(sphere1);
                 VirtualCamera.Run();
             }
