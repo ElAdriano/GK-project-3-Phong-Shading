@@ -30,7 +30,7 @@ namespace VirtualCamera
             renderForm = new RenderForm("VirtualCamera");
             renderForm.ClientSize = new Size(Width, Height);
             renderForm.AllowUserResizing = false;
-            Position = new Vector3(0, 0, 10);
+            Position = new Vector3(0, 0, 0);
             Target = new Vector3(0, 0, 9f);
 
             SceneCache = new byte[Width * Height * 4];

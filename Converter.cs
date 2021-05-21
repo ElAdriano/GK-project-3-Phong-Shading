@@ -19,12 +19,19 @@ namespace VirtualCamera
             camera.SceneCache[index + 3] = alpha;
         }
 
+        private static Vector2 UncastFrom2D(int pixelX, int pixelY)
+        {
+            var x = (2 * pixelX - Camera.Width) / (2 * Camera.Width);
+            var y = (Camera.Height - 2*pixelY) / Camera.Height;
+            return new Vector2(x, y);
+        }
+
         public static void Render(List<Sphere> objects, Camera camera)
         {
             for (int objNum = 0; objNum < objects.Count; objNum++)
             {
                 Sphere obj = objects[objNum];
-                if (obj.Origin.Z > 0)
+                if (obj.Origin.Z <= 0)
                 {
                     continue;
                 }
@@ -33,10 +40,16 @@ namespace VirtualCamera
                 {
                     for(int height = 0; height < Camera.Height; height++)
                     {
-                        float illumination = obj.getIlumination(width, height, camera.Position, camera.Light.Position);
+                        Vector2 point = UncastFrom2D(width, height);
+
+                        float illumination = obj.getIlumination(point.X, point.Y, camera.Position, camera.Light.Position);
                         byte intensity = (byte)Math.Min(illumination * 255, 255);
-                        Console.WriteLine(intensity);
-                        UpdatePixelValue(width, height, (byte)(255 * obj.Color.Red), (byte)(255 * obj.Color.Green), (byte)(255 * obj.Color.Blue), intensity, camera);
+                        if (intensity > 0)
+                        {
+                            Console.WriteLine(intensity);
+                        }
+                        var calculatedColor = intensity * obj.Color;
+                        UpdatePixelValue(width, height, (byte)calculatedColor.Red, (byte)calculatedColor.Green, (byte)calculatedColor.Blue, 255, camera);
                     }
                 }
             }

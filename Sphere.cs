@@ -41,7 +41,7 @@ namespace VirtualCamera
         public float getIlumination(float x, float y, Vector3 cameraPosition, Vector3 lightPosition)
         {
             //potrzebne vectory
-            if(Math.Pow((x - Origin.x),2) + Math.Pow((y - Origin.y), 2) > Math.Pow(R, 2))
+            if(Math.Pow((x - Origin.X),2) + Math.Pow((y - Origin.Y), 2) > Math.Pow(R, 2))
             {
                 return 0;
             }
