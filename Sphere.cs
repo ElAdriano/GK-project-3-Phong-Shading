@@ -15,12 +15,12 @@ namespace VirtualCamera
         public Color4 Color;
         public Vector3 Ambient;
 
-        float IA = 0.5f;
-        float IP = 0.5f;
-        float KA = (float)0.5;
-        float KD = (float)0.005;
-        float KS = (float)0.05;
-        float N = 15;
+        float IA = 1f;
+        float IP = 0.75f;
+        float KA = (float)0.25;
+        float KD = (float)0.35;
+        float KS = (float)0.15;
+        float N = 5;
 
 
         public Sphere(Vector3 origin, float r, Color4 color)
