@@ -42,31 +42,15 @@ namespace VirtualCamera
                     {
                         Vector2 point = UncastFrom2D(width, height);
 
-                        //Console.WriteLine("x: {0}, y: {1}", point.X, point.Y);
-                        bool shouldPaintPixel = obj.IsPixelOwned(point.X, point.Y);
-                        if (shouldPaintPixel)
+                        if (obj.IsPixelOwned(point.X, point.Y))
                         {
                             float illumination = obj.getIlumination(point.X, point.Y, camera.Position, camera.Light.Position);
                             float intensity = (float)Math.Min(illumination, 1);
                             var calculatedColor = intensity * obj.Color;
 
                             var redColorValue = calculatedColor.Red * 255;
-                            if (redColorValue > 255)
-                            {
-                                Console.WriteLine("Red color value exceeded : value = {0}", redColorValue);
-                            }
-
                             var greenColorValue = calculatedColor.Green * 255;
-                            if (greenColorValue > 255)
-                            {
-                                Console.WriteLine("Green color value exceeded : value = {0}", greenColorValue);
-                            }
-
                             var blueColorValue = calculatedColor.Blue * 255;
-                            if (blueColorValue > 255)
-                            {
-                                Console.WriteLine("Blue color value exceeded : value = {0}", blueColorValue);
-                            }
 
                             UpdatePixelValue(width, height, (byte)redColorValue, (byte)greenColorValue, (byte)blueColorValue, 255, camera);
                         }

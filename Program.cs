@@ -17,7 +17,7 @@ namespace VirtualCamera
         {
             using (Camera VirtualCamera = new Camera())
             {
-                Sphere sphere1 = new Sphere(new Vector3(0, 0, 10), 0.1f, new Color4(new Color3(0.2f, 1f, 0.2f), 255));
+                Sphere sphere1 = new Sphere(new Vector3(0, 0, 10), 0.4f, new Color4(new Color3(0.2f, 1f, 0.2f), 255));
                 VirtualCamera.AddSphere(sphere1);
                 VirtualCamera.Run();
             }
