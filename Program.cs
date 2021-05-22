@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SharpDX;
+﻿using SharpDX;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,8 +15,46 @@ namespace VirtualCamera
         {
             using (Camera VirtualCamera = new Camera())
             {
-                Sphere sphere1 = new Sphere(new Vector3(0, 0, 10), 0.4f, new Color4(new Color3(0.2f, 1f, 0.2f), 255));
-                VirtualCamera.AddSphere(sphere1);
+                Sphere tennisBall = new Sphere(
+                    new Vector3(0, 0, 10), // origin
+                    0.125f,   // r
+                    new Color4(new Color3(0.2f, 1f, 0.2f), 255), // object color
+                    1f,     // Ambient intensity
+                    0.75f,  // Incident light intensity
+                    0.15f,  // ambient k coefficient [0, 1]
+                    0.35f,  // diffuse k coefficient [0, 1]
+                    0.15f,  // specular k coefficient [0, 1]
+                    10       // n
+                );
+
+                Sphere metalBall = new Sphere(
+                    new Vector3(0.3f, 0, 10), // origin
+                    0.125f,  // r
+                    new Color4(new Color3(0.2f, 0.2f, 1f), 255), // object color
+                    1f,     // Ambient intensity
+                    0.7f,  // Incident light intensity
+                    0.1f,   // ambient k coefficient [0, 1]
+                    1f,     // diffuse k coefficient [0, 1]
+                    0.3f,   // specular k coefficient [0, 1]
+                    50      // n
+                );
+
+                Sphere plasticBall = new Sphere(
+                    new Vector3(-0.3f, 0, 10), // origin
+                    0.125f,  // r
+                    new Color4(new Color3(1f, 0.2f, 0.2f), 255), // object color
+                    1f,     // Ambient intensity
+                    0.9f,  // Incident light intensity
+                    0.1f,   // ambient k coefficient [0, 1]
+                    0.5f,     // diffuse k coefficient [0, 1]
+                    1f,   // specular k coefficient [0, 1]
+                    100      // n
+                );
+
+                //VirtualCamera.AddSphere(tennisBall);
+                //VirtualCamera.AddSphere(plasticBall); // red ball
+                VirtualCamera.AddSphere(metalBall);
+                
                 VirtualCamera.Run();
             }
         }

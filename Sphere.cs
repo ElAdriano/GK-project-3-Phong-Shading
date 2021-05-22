@@ -15,36 +15,38 @@ namespace VirtualCamera
         public Color4 Color;
         public Vector3 Ambient;
 
-        float IA = 1f;
-        float IP = 0.7f;
-        float KA = (float)0.1;
-        float KD = (float)0.4;
-        float KS = (float)0.3;
-        float N = 100f;
+        float IA;
+        float IP;
+        float KA;
+        float KD;
+        float KS;
+        float n;
 
-
-        public Sphere(Vector3 origin, float r, Color4 color)
+        public Sphere(Vector3 origin, float r, Color4 color, float IA, float IP, float KA, float KD, float KS, float N)
         {
             Origin = origin;
             R = r;
             Color = color;
+
+            this.IA = IA;
+            this.IP = IP;
+            this.KA = KA;
+            this.KD = KD;
+            this.KS = KS;
+            this.n = N;
         }
 
         public Vector3 getPoint(float x, float y)
         {
             //z = sqrt(r^2 - (x-a)^2 - (y-b)^2) + c
             float z2c = (float)(Math.Pow(R, 2) - Math.Pow((x - Origin.X), 2) - Math.Pow((y - Origin.Y), 2));
-            if (z2c < 0)
-                Console.WriteLine("z2c jest ujemne jakims cudem");
             float z = (float)Math.Sqrt(z2c) + Origin.Z;
-            if(z<0)
-                Console.WriteLine("Z jest ujemne jakims cudem");
             return new Vector3(x, y, z);
         }
 
         public float getIlumination(float x, float y, Vector3 cameraPosition, Vector3 lightPosition)
         {
-            //potrzebne vectory
+            /*//potrzebne vectory
             Vector3 point = getPoint(x, y);
             //Vector3 poVector = cameraPosition - point;
             Vector3 poVector = point - cameraPosition;
@@ -57,7 +59,29 @@ namespace VirtualCamera
             r.Normalize();
             float ndotpl = Vector3.Dot(normal, plVector);
             float rdotpo = Vector3.Dot(r,poVector);
-            return (float)(IA * KA + IP * KD * Math.Max(ndotpl,0) +  KS * Math.Pow( Math.Max(rdotpo,0), N));
+            return (float)(IA * KA + IP * KD * Math.Max(ndotpl,0) +  KS * Math.Pow( Math.Max(rdotpo,0), N));*/
+            bool shouldIlluminate = IsPixelOwned(x, y);
+            if (shouldIlluminate)
+            {
+                Vector3 point = getPoint(x, y);
+                Vector3 N = point - Origin;
+                N.Normalize();
+
+                Vector3 L = lightPosition - point;
+                L.Normalize();
+
+                Vector3 V = point - cameraPosition;
+                V.Normalize();
+
+                Vector3 R = 2 * Vector3.Dot(N, L) * N - L;
+                R.Normalize();
+
+                return (float)(IA * KA + IP * KD * Math.Max(Vector3.Dot(N, L), 0) + IP * KS * Math.Pow(Math.Max(Vector3.Dot(R, V), 0), n));
+            }
+            else
+            {
+                return 0f;
+            }
         }
 
         public bool IsPixelOwned(float pixelX, float pixelY)

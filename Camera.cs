@@ -55,7 +55,7 @@ namespace VirtualCamera
             SceneBuffer = new SharpDX.Direct2D1.Bitmap(CameraView, new SharpDX.Size2(Width, Height), new SharpDX.Direct2D1.BitmapProperties(CameraView.PixelFormat));
 
             SceneObjects = new List<Sphere>();
-            Light = new LightSource(0, 10, 0);
+            Light = new LightSource(0, 10, 20);
         }
 
         public void AddSphere(Sphere sphere)
@@ -68,32 +68,32 @@ namespace VirtualCamera
         {
             if (Keyboard.IsKeyDown(Key.Down))
             {
-                Light.Position = new Vector3(Light.Position.X, Light.Position.Y - 0.5f, Light.Position.Z);
+                Light.Position = new Vector3(Light.Position.X, Light.Position.Y - 1f, Light.Position.Z);
             }
 
             if (Keyboard.IsKeyDown(Key.Up))
             {
-                Light.Position = new Vector3(Light.Position.X, Light.Position.Y + 0.5f, Light.Position.Z);
+                Light.Position = new Vector3(Light.Position.X, Light.Position.Y + 1f, Light.Position.Z);
             }
 
             if (Keyboard.IsKeyDown(Key.Right))
             {
-                Light.Position = new Vector3(Light.Position.X + 0.5f, Light.Position.Y, Light.Position.Z);
+                Light.Position = new Vector3(Light.Position.X + 1f, Light.Position.Y, Light.Position.Z);
             }
 
             if (Keyboard.IsKeyDown(Key.Left))
             {
-                Light.Position = new Vector3(Light.Position.X - 0.5f, Light.Position.Y, Light.Position.Z);
+                Light.Position = new Vector3(Light.Position.X - 1f, Light.Position.Y, Light.Position.Z);
             }
 
             if (Keyboard.IsKeyDown(Key.W))
             {
-                Light.Position = new Vector3(Light.Position.X, Light.Position.Y, Light.Position.Z + 0.5f);
+                Light.Position = new Vector3(Light.Position.X, Light.Position.Y, Light.Position.Z - 1f);
             }
 
             if (Keyboard.IsKeyDown(Key.S))
             {
-                Light.Position = new Vector3(Light.Position.X, Light.Position.Y, Light.Position.Z - 0.5f);
+                Light.Position = new Vector3(Light.Position.X, Light.Position.Y, Light.Position.Z + 1f);
             }
         }
 
