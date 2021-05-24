@@ -46,20 +46,6 @@ namespace VirtualCamera
 
         public float getIlumination(float x, float y, Vector3 cameraPosition, Vector3 lightPosition)
         {
-            /*//potrzebne vectory
-            Vector3 point = getPoint(x, y);
-            //Vector3 poVector = cameraPosition - point;
-            Vector3 poVector = point - cameraPosition;
-            Vector3 plVector = lightPosition - point;
-            Vector3 normal = point - Origin;
-            poVector.Normalize();
-            plVector.Normalize();
-            normal.Normalize();
-            Vector3 r = Vector3.Subtract(Vector3.Multiply(normal, Vector3.Dot(normal, plVector) *2), plVector);
-            r.Normalize();
-            float ndotpl = Vector3.Dot(normal, plVector);
-            float rdotpo = Vector3.Dot(r,poVector);
-            return (float)(IA * KA + IP * KD * Math.Max(ndotpl,0) +  KS * Math.Pow( Math.Max(rdotpo,0), N));*/
             bool shouldIlluminate = IsPixelOwned(x, y);
             if (shouldIlluminate)
             {
